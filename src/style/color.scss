@@ -1,0 +1,106 @@
+// red
+$red: rgba(234, 59, 59, 1);
+
+// green
+$green: rgba(117, 201, 120, 1);
+
+// blue
+$blue: rgba(66, 133, 244, 1);
+
+// yellow
+$yellow: rgba(251, 188, 5);
+
+// purple
+$purple: rgba(156, 39, 176);
+
+// orange
+$orange: rgba(255, 152, 0, 1);
+
+// teal
+$teal: rgba(0, 150, 136);
+
+// pink
+$pink: rgba(223, 73, 123);
+
+// brown
+$brown: rgba(121, 85, 72);
+
+// grey
+$grey: rgba(158, 158, 158);
+
+// cyan
+$cyan: rgba(0, 188, 212);
+
+// lime
+$lime: rgba(163, 220, 57);
+
+// amber
+$amber: rgba(255, 193, 7);
+
+// indigo
+$indigo: rgba(73, 46, 171);
+
+// white
+$white: rgba(237, 229, 229);
+
+// black
+$black: rgba(20, 20, 20);
+
+@function color-luminance($color) {
+  $red: red($color);
+  $green: green($color);
+  $blue: blue($color);
+  @return 0.299 * $red + 0.584 * $green + 0.114 * $blue;
+}
+
+@function darken-color($color, $amount: 10%) {
+  @return mix(black, $color, $amount);
+}
+
+@function lighten-color($color, $amount: 10%) {
+  @return mix(white, $color, $amount);
+}
+
+// theme
+$theme: $orange;
+$theme-disabled: rgba(darken-color($theme, 20%),0.8);
+
+// text
+$text: if(color-luminance($theme) > 165, $black, $white);
+$text-mute: rgba($text, 0.7);
+$text-disabled: if(color-luminance($theme-disabled) > 130, $black, $white);
+
+:root {
+  --theme-r: #{red($theme)};
+  --theme-g: #{green($theme)};
+  --theme-b: #{blue($theme)};
+  --theme: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 1);
+  --theme-mute: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.7);
+  --theme-hover: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.9);
+  --theme-disabled: rgba(
+    calc(var(--theme-r) * 0.9),
+    calc(var(--theme-g) * 0.9),
+    calc(var(--theme-b) * 0.9),
+    0.8);
+
+  --text: #{$text};
+  --text-mute: #{$text-mute};
+  --text-disabled: #{$text-disabled};
+
+  --red: #{$red};
+  --green: #{$green};
+  --blue: #{$blue};
+  --yellow: #{$yellow};
+  --purple: #{$purple};
+  --orange: #{$orange};
+  --teal: #{$teal};
+  --pink: #{$pink};
+  --brown: #{$brown};
+  --grey: #{$grey};
+  --cyan: #{$cyan};
+  --lime: #{$lime};
+  --amber: #{$amber};
+  --indigo: #{$indigo};
+  --white: #{$white};
+  --black: #{$black};
+}
