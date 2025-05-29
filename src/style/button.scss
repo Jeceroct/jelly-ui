@@ -1,0 +1,58 @@
+@use "base";
+@use "animations";
+@use "color";
+.j-button {
+  align-items: center;
+  justify-content: center;
+
+  display: flex;
+  padding: 10px 15px;
+  margin: 5px;
+
+  border: 1px solid #ccc;
+
+  background-color: var(--theme-mute);
+  color: var(--text);
+
+  position: relative;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    background-color: var(--theme-hover);
+  }
+
+  .j-button__start {
+    margin-inline-end: 5px;
+  }
+  .j-button__end {
+    margin-inline-start: 5px;
+  }
+}
+
+.j-button__before {
+  opacity: 0;
+  transition: all 0.3s;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 100%;
+  inline-size: 100%;
+  color: var(--text-disabled);
+  background-color: var(--theme-disabled);
+  backdrop-filter: blur(2px);
+  border-radius: base.$border-radius;
+  font-weight: base.$font-weight;
+}
+
+.j-button--disabled {
+  cursor: not-allowed;
+  .j-button__before {
+    opacity: 1;
+  }
+}
