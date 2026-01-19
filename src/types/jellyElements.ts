@@ -1,62 +1,199 @@
 import {
-  type JellyHTMLElement,
+  type JellyElement,
+  type jellyElement,
   type JellyHTMLButtonElement,
-  changeColor,
+  J_ChangeColor,
   type JColor,
+  type JellyHTMLSwitcherElement,
+  type JellyHTMLDialogElement,
 } from "..";
 
-type JellyElement = JellyHTMLElement | JellyHTMLButtonElement;
-
-const JellyElements = new Map<string, JellyElement | JellyElement[]>();
-
-// addJellyElement用于告知JellyFlex你在页面中添加了一个新的Jelly元素，当你在jelly元素上指定了j-selector属性时，这个函数会自动调用。
-const addJellyElement = (jSelector: string, element: JellyElement): void => {
+const initJellyElement = (element: JellyElement): void => {
+  // 类型初始化
   element instanceof HTMLElement && initializeHTMLElements(element!);
   element.getAttribute("j-type") == "JellyHTMLButtonElement" &&
     initializeButtonElements(element as JellyHTMLButtonElement);
-  if (JellyElements.has(jSelector)) {
-    const oldElement = JellyElements.get(jSelector) as
-      | JellyElement
-      | JellyElement[];
-    if (oldElement instanceof Array) {
-      oldElement.push(element);
-    } else {
-      JellyElements.set(jSelector, [oldElement, element]);
-    }
-    return;
-  }
-  JellyElements.set(jSelector, element);
+  element.getAttribute("j-type") == "JellyHTMLSwitcherElement" &&
+    initializeSwitcherElements(element as JellyHTMLSwitcherElement);
+  element.getAttribute("j-type") == "JellyHTMLDialogElement" &&
+    initializeDialogElements(element as JellyHTMLDialogElement);
 };
 
-// removeJellyElement接受一个j-selector字符串，然后告知JellyFlex你在页面中移除了一个Jelly元素，当你调用了HTMLElement上的remove方法时，这个函数会自动调用。
-const removeJellyElement = (jSelector: string): void => {
-  JellyElements.delete(jSelector);
-};
-
-// getJellyElements接受一个j-selector字符串，返回一个Jelly元素，只有当你在jelly元素上指定了j-selector属性后，才能被此函数找到。
 const getJellyElements = <T extends JellyElement>(
-  jSelector: string
-): T | undefined => {
-  if (
-    JellyElements.has(jSelector) &&
-    JellyElements.get(jSelector) instanceof Array
-  ) {
-    const res = JellyElements.get(jSelector) as T[];
-    return res[0] as T;
+  jSelector: jellyElement,
+  ele = document.documentElement
+): T | null => {
+  const jSelectorArr = jSelector.split(" ", 2) as jellyElement[];
+  let resultEle: T | null = null;
+  if (jSelectorArr[0].startsWith("#") || jSelectorArr[0].startsWith(".")) {
+    ele.childNodes.forEach((node) => {
+      if (node instanceof HTMLElement) {
+        if (node.getAttribute("j-selector")?.match(jSelectorArr[0])) {
+          resultEle = node as T;
+        } else {
+          const res = getJellyElements(jSelectorArr[0], node);
+          if (res) resultEle = res as T;
+        }
+      }
+    });
+  } else {
+    ele.childNodes.forEach((node) => {
+      if (node instanceof HTMLElement) {
+        if (node.getAttribute("j-type") == jSelectorArr[0]) {
+          resultEle = node as T;
+        } else {
+          const res = getJellyElements(jSelectorArr[0], node);
+          if (res) resultEle = res as T;
+        }
+      }
+    });
   }
-  return JellyElements.get(jSelector) as T;
+  if (jSelectorArr.length > 1 && resultEle) {
+    const res = getJellyElements(jSelectorArr[1], resultEle);
+    if (res) resultEle = res as T;
+  }
+  return resultEle;
 };
 
 const getJellyElementsAll = <T extends JellyElement>(
-  jSelector: string
-): T[] | undefined => {
-  return JellyElements.get(jSelector) as T[];
+  jSelector: jellyElement,
+  ele = document.documentElement
+): T[] => {
+  const jSelectorArr = jSelector.split(" ", 2) as jellyElement[];
+  let resultEle: T[] = [];
+  if (jSelectorArr[0].startsWith("#") || jSelectorArr[0].startsWith(".")) {
+    ele.childNodes.forEach((node) => {
+      if (node instanceof HTMLElement) {
+        if (node.getAttribute("j-selector")?.match(jSelectorArr[0])) {
+          resultEle.push(node as T);
+        } else {
+          const res = getJellyElementsAll(jSelectorArr[0], node);
+          if (res) resultEle = resultEle.concat(res as T[]);
+        }
+      }
+    });
+  } else {
+    ele.childNodes.forEach((node) => {
+      if (node instanceof HTMLElement) {
+        if (node.getAttribute("j-type") == jSelectorArr[0]) {
+          resultEle.push(node as T);
+        } else {
+          const res = getJellyElementsAll(jSelectorArr[0], node);
+          if (res) resultEle = resultEle.concat(res as T[]);
+        }
+      }
+    });
+  }
+  if (jSelectorArr.length > 1 && resultEle) {
+    resultEle.forEach((ele) => {
+      const res = getJellyElementsAll(jSelectorArr[1], ele);
+      if (res) resultEle = resultEle.concat(res as T[]);
+    });
+  }
+  return resultEle;
 };
 
 // 初始化Jelly元素
 const initializeHTMLElements = (ele: JellyElement): void => {
   ele.changeColor = (color: JColor): void => {
-    changeColor(color, ele as HTMLElement);
+    J_ChangeColor(color, ele as HTMLElement);
+  };
+
+  // const _isKeywords = (str: string): boolean => {
+  //     const keywords = [
+  //         "auto",
+  //         "max-content",
+  //         "min-content",
+  //         "fit-content",
+  //         "unset",
+  //         "inherit",
+  //         "initial",
+  //     ];
+  //     return keywords.includes(str);
+  // };
+
+  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  let timer: number;
+  const _mediaQueryHandler = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const isDesktop = mediaQuery.matches;
+      const width = isDesktop
+        ? ele.style.getPropertyValue("--width-on-desktop-device")
+        : ele.style.getPropertyValue("--width-on-mobile-device") ||
+          ele.style.getPropertyValue("--width-on-desktop-device");
+      const height = isDesktop
+        ? ele.style.getPropertyValue("--height-on-desktop-device")
+        : ele.style.getPropertyValue("--height-on-mobile-device") ||
+          ele.style.getPropertyValue("--height-on-desktop-device");
+
+      ele.style.setProperty("--width", width);
+      ele.style.setProperty("--height", height);
+
+      // _isKeywords(width) &&
+      //   requestAnimationFrame(() => {
+      //     ele.style.setProperty("--width", ele.offsetWidth + "px");
+      //   });
+      // _isKeywords(height) &&
+      //   requestAnimationFrame(() => {
+      //     ele.style.setProperty("--height", ele.offsetHeight + "px");
+      //   });
+    }, 100);
+  };
+
+  // mediaQuery.addEventListener("change", _mediaQueryHandler);
+  window.addEventListener("resize", _mediaQueryHandler);
+
+  ele.setWidth = (
+    widthOnDesktopDevice: string,
+    widthOnMobileDevice?: string
+  ): void => {
+    const desktopValue = widthOnDesktopDevice;
+    const mobileValue = widthOnMobileDevice ? widthOnMobileDevice : undefined;
+
+    ele.style.setProperty("--width-on-desktop-device", desktopValue);
+    if (mobileValue) {
+      ele.style.setProperty("--width-on-mobile-device", mobileValue);
+    }
+
+    mediaQuery.matches
+      ? ele.style.setProperty("--width", desktopValue)
+      : ele.style.setProperty("--width", mobileValue || desktopValue);
+
+    // _isKeywords(!mobileValue ? desktopValue : mobileValue!) &&
+    // requestAnimationFrame(() => {
+    //     ele.style.setProperty("--width", ele.offsetWidth + "px");
+    // });
+  };
+
+  ele.setHeight = (
+    heightOnDesktopDevice: string,
+    heightOnMobileDevice?: string
+  ): void => {
+    const desktopValue = heightOnDesktopDevice;
+    const mobileValue = heightOnMobileDevice ? heightOnMobileDevice : undefined;
+
+    ele.style.setProperty("--height-on-desktop-device", desktopValue);
+    if (mobileValue) {
+      ele.style.setProperty("--height-on-mobile-device", mobileValue);
+    }
+
+    mediaQuery.matches
+      ? ele.style.setProperty("--height", desktopValue)
+      : ele.style.setProperty("--height", mobileValue || desktopValue);
+
+    // _isKeywords(!mobileValue ? desktopValue : mobileValue) &&
+    // requestAnimationFrame(() => {
+    //     ele.style.setProperty("--height", ele.offsetHeight + "px");
+    // });
+  };
+
+  ele.getJellyElements = (selector: jellyElement): JellyElement | null => {
+    return getJellyElements(selector, ele);
+  };
+
+  ele.getJellyElementsAll = (selector: jellyElement): JellyElement[] => {
+    return getJellyElementsAll(selector, ele);
   };
 };
 
@@ -79,17 +216,20 @@ const initializeButtonElements = (ele: JellyHTMLButtonElement): void => {
     if (beforeEnableTip) {
       ele.querySelector(".j-button__before")!.textContent = beforeEnableTip;
       const oldColor = ele.computedStyleMap().get("--theme")
-        ? ele.computedStyleMap().get('--theme')?.toString() as JColor
-        : document.documentElement.computedStyleMap().get('--theme')?.toString() as JColor;
+        ? (ele.computedStyleMap().get("--theme")?.toString() as JColor)
+        : (document.documentElement
+            .computedStyleMap()
+            .get("--theme")
+            ?.toString() as JColor);
       if (beforeEnableColor) {
         ele.changeColor(beforeEnableColor);
+        setTimeout(() => {
+          ele.changeColor(oldColor);
+          ele.classList.remove("j-button--disabled");
+          ele.disabled = false;
+          ele.removeAttribute("title");
+        }, 1500);
       }
-      setTimeout(() => {
-        ele.changeColor(oldColor);
-        ele.classList.remove("j-button--disabled");
-        ele.disabled = false;
-        ele.removeAttribute("title");
-      }, 1500);
     } else {
       ele.classList.remove("j-button--disabled");
       ele.disabled = false;
@@ -98,9 +238,93 @@ const initializeButtonElements = (ele: JellyHTMLButtonElement): void => {
   };
 };
 
+// 初始化switcher元素
+const initializeSwitcherElements = (ele: JellyHTMLSwitcherElement): void => {
+  ele.check = () => {
+    if (ele.getAttribute("multi") == "true") {
+      throw new Error(
+        "JellyHTMLSwitcherElement.check(): check方法只能作用于单选按钮"
+      );
+    }
+    ele.querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked =
+      true;
+  };
+
+  ele.uncheck = () => {
+    if (ele.getAttribute("multi") == "true") {
+      throw new Error(
+        "JellyHTMLSwitcherElement.uncheck(): uncheck方法只能作用于单选按钮"
+      );
+    }
+    ele.querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked =
+      false;
+  };
+
+  ele.enable = (beforeEnableTip?: string, beforeEnableColor?: JColor) => {
+    const disableEle = ele.querySelector<HTMLDivElement>(
+      ".j-switcher__disable-text"
+    )!;
+    disableEle.classList.remove("j-switcher__disable-text--show");
+    disableEle.textContent = "";
+    ele.querySelectorAll<HTMLInputElement>("input")!.forEach((input) => {
+      input.disabled = false;
+    });
+  };
+
+  ele.disable = (tip?: string, during?: number) => {
+    const disableEle = ele.querySelector<HTMLDivElement>(
+      ".j-switcher__disable-text"
+    )!;
+    disableEle.classList.add("j-switcher__disable-text--show");
+    tip && (disableEle.textContent = tip);
+    ele.querySelectorAll<HTMLInputElement>("input")!.forEach((input) => {
+      input.disabled = true;
+    });
+    if (during) {
+      setTimeout(() => {
+        ele.enable();
+      }, during);
+    }
+  };
+};
+
+// 初始化Dialog元素
+const initializeDialogElements = (ele: JellyHTMLDialogElement): void => {
+  const _setContentColor = () => {
+    const r = ele.style.getPropertyValue('--theme-r') || document.documentElement.style.getPropertyValue('--theme-r')
+    const g = ele.style.getPropertyValue('--theme-g') || document.documentElement.style.getPropertyValue('--theme-g')
+    const b = ele.style.getPropertyValue('--theme-b') || document.documentElement.style.getPropertyValue('--theme-b')
+    const [rgb_r, rgb_g, rgb_b] = [r, g, b].map((v) => parseInt(v))
+    console.log(rgb_r, rgb_g, rgb_b)
+    ele.style.setProperty('--content-bg-color', (rgb_r * 0.299 + rgb_g * 0.587 + rgb_b * 0.114 > 165) ? "rgba(237, 229, 229)" : "rgba(50, 50, 50)")
+    ele.style.setProperty('--content-text-color', (rgb_r * 0.299 + rgb_g * 0.587 + rgb_b * 0.114 > 165)? "rgba(20, 20, 20)" : "rgba(237, 229, 229)")
+  }
+  ele.show = () => {
+    _setContentColor();
+    ele.showModal();
+    ele.classList.contains("j-dialog--beforeClose") &&
+      ele.classList.remove("j-dialog--beforeClose");
+    ele.classList.contains("j-dialog--close") &&
+      ele.classList.remove("j-dialog--close");
+  };
+
+  ele._originClose = ele.close;
+  ele.close = () => {
+    !ele.classList.contains("j-dialog--beforeClose") &&
+      ele.classList.add("j-dialog--beforeClose");
+    !ele.classList.contains("j-dialog--close") &&
+      setTimeout(() => {
+        ele.classList.add("j-dialog--close");
+        ele.classList.contains("j-dialog--beforeClose") &&
+          ele.classList.remove("j-dialog--beforeClose");
+        ele._originClose();
+      }, 200);
+  };
+};
+
 export {
-  addJellyElement,
-  removeJellyElement,
+  initJellyElement,
+  // removeJellyElement,
   getJellyElements,
   getJellyElementsAll,
 };

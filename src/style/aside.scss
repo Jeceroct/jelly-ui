@@ -1,0 +1,51 @@
+@use "base";
+@use "color";
+
+@keyframes init {
+  0% {
+    height: 0;
+    width: 0;
+  }
+  80% {
+    height: calc(var(--height) + 5px);
+    width: calc(var(--width) + 5px);
+  }
+  100% {
+    height: calc(var(--height) - 20px);
+    width: var(--width);
+    opacity: 1;
+  }
+}
+
+// body {
+//   overflow: scroll;
+// }
+
+.j-aside {
+  position: absolute;
+  --top: 0;
+  --left: 0;
+  top: var(--top);
+  left: var(--left);
+
+  --width: 200px;
+  --height: 100vh;
+  width: var(--width);
+  height: calc(var(--height) - 20px);
+  // height: var(--height);
+
+  opacity: 0;
+
+  z-index: 1000;
+
+  margin: 10px;
+
+  background-color: var(--theme-mute);
+
+  transform-origin: 0% 0%;
+
+  animation: init 0.5s forwards;
+  animation-delay: 0.6s;
+  transition: all 0s;
+
+}

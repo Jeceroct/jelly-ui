@@ -63,7 +63,11 @@ $black: rgba(20, 20, 20);
 
 // theme
 $theme: $orange;
-$theme-disabled: rgba(darken-color($theme, 20%),0.8);
+$theme-disabled: rgba(
+  calc(red($theme) * 0.5),
+  calc(green($theme) * 0.5),
+  calc(blue($theme) * 0.5),
+  0.8);
 
 // text
 $text: if(color-luminance($theme) > 165, $black, $white);
@@ -77,10 +81,15 @@ $text-disabled: if(color-luminance($theme-disabled) > 130, $black, $white);
   --theme: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 1);
   --theme-mute: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.7);
   --theme-hover: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.9);
+  --theme-background: rgba(
+    calc(var(--theme-r) * 1.1),
+    calc(var(--theme-g) * 1.1),
+    calc(var(--theme-b) * 1.1),
+    0.15);
   --theme-disabled: rgba(
-    calc(var(--theme-r) * 0.9),
-    calc(var(--theme-g) * 0.9),
-    calc(var(--theme-b) * 0.9),
+    calc(var(--theme-r) * 0.5),
+    calc(var(--theme-g) * 0.5),
+    calc(var(--theme-b) * 0.5),
     0.8);
 
   --text: #{$text};

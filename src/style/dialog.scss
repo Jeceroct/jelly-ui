@@ -1,0 +1,129 @@
+@use "base";
+@use "color";
+
+@keyframes pop_in {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes pop_out {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+@keyframes fade_in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade_out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.j-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  backdrop-filter: blur(1px);
+
+  animation: fade_in 0.2s;
+  --content-bg-color: white;
+  --content-text-color: black;
+  color: var(--content-text-color);
+
+  .j-dialog__container {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    border-radius: 15px;
+
+    width: var(--width);
+    height: var(--height);
+
+    background-color: var(--content-bg-color);
+
+    transform-origin: 50% 50%;
+
+    transform: translate(-50%, -50%);
+    animation: pop_in 0.2s;
+
+    padding: 10px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-shadow: 0 0 50px 0 rgba($color: #000000, $alpha: 0.3);
+
+    .j-dialog__container__title {
+      width: 100%;
+      padding: 0;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      h2 {
+        margin: 0;
+      }
+    }
+    .j-dialog__container__content {
+      width: 100%;
+      padding: 15px 10px;
+      margin: 10px 0;
+
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      justify-content: center;
+
+      background-color: var(--theme-background);
+      border-radius: 15px;
+    }
+    .j-dialog__container__footer {
+      width: 100%;
+      padding: 5px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+.j-dialog.j-dialog--beforeClose {
+  animation: fade_out 0.2s;
+  .j-dialog__container {
+    animation: pop_out 0.2s;
+  }
+}
+
+.j-dialog.j-dialog--close {
+  display: none;
+}

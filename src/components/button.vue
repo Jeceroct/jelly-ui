@@ -1,5 +1,5 @@
 <template>
-  <button class="j-button jelly-flex" ref="thisRef" j-type="JellyHTMLButtonElement">
+  <button class="j-button jelly-ui" ref="thisRef" j-type="JellyHTMLButtonElement" :j-selector="props.jSelector">
     <div class="j-button__before">已禁用</div>
     <div class="j-button__start" v-if="hasStartSlot">
       <slot name="start"></slot>
@@ -15,8 +15,7 @@
 
 <script lang="ts" setup>
 import { defineComponent, onMounted, ref, type PropType } from 'vue';
-import type { JColor, JellyHTMLButtonElement } from '../'
-import { addJellyElement } from '../'
+import { type JColor, type JellyHTMLButtonElement, initJellyElement } from '../'
 
 const thisRef = ref<JellyHTMLButtonElement>()
 
@@ -31,7 +30,7 @@ defineComponent({
 const props = defineProps({
   jSelector: {
     type: String as PropType<string>,
-    default: '',
+    default: 'nameless',
     required: false
   },
   width: {
@@ -45,7 +44,7 @@ const props = defineProps({
     required: false
   },
   disabled: {
-    type: (Boolean||String) as PropType<boolean | string>,
+    type: [String, Boolean] as PropType<string | boolean>,
     default: false,
     required: false
   },
@@ -59,19 +58,19 @@ const props = defineProps({
 
 onMounted(() => {
   if (thisRef.value) {
-    thisRef.value.style.width = props.width
-    thisRef.value.style.height = props.height
-    if (props.jSelector) {
-      addJellyElement(props.jSelector, thisRef.value)
-    }
+    initJellyElement(thisRef.value)
+    const widths: string[] = props.width.split(' ')
+    thisRef.value.setWidth(widths[0], widths[1]!)
+    const heights: string[] = props.height.split(' ')
+    thisRef.value.setHeight(heights[0], heights[1]!)
     if (thisRef.value.querySelector('.j-button__start')?.innerHTML === '') {
       hasStartSlot.value = false
     }
     if (thisRef.value.querySelector('.j-button__end')?.innerHTML === '') {
       hasEndSlot.value = false
     }
-    if (props.disabled) {
-      thisRef.value.disable(typeof props.disabled == 'string' ? props.disabled : '已禁用')
+    if (typeof props.disabled == 'string') {
+      thisRef.value.disable(props.disabled != '' ? props.disabled : '已禁用')
     }
     if (props.color) {
       thisRef.value.changeColor(props.color)
