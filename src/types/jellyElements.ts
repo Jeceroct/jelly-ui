@@ -260,7 +260,7 @@ const initializeSwitcherElements = (ele: JellyHTMLSwitcherElement): void => {
       false;
   };
 
-  ele.enable = (beforeEnableTip?: string, beforeEnableColor?: JColor) => {
+  ele.enable = (_beforeEnableTip?: string, _beforeEnableColor?: JColor) => {
     const disableEle = ele.querySelector<HTMLDivElement>(
       ".j-switcher__disable-text"
     )!;

@@ -1,5 +1,5 @@
 <template>
-  <div ref="thisRef" class="j-field jelly-ui" j-type="JellyHTMLFieldElement" :j-selector="props.jSelector">
+  <div ref="thisRef" class="j-field jelly-flex" j-type="JellyHTMLFieldElement" :j-selector="props.jSelector">
     <h3 class="j-field__title" v-if="props.title">
       {{ props.title }}
     </h3>

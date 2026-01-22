@@ -1,5 +1,5 @@
 <template>
-  <aside class="j-aside jelly-ui" ref="thisRef" j-type="JellyHTMLAsideElement" :j-selector="props.jSelector">
+  <aside class="j-aside jelly-flex" ref="thisRef" j-type="JellyHTMLAsideElement" :j-selector="props.jSelector">
     <div class="j-aside__container">
       <div class="j-aside__container__title" v-if="hasTitleSlot">
         <h2 v-if="props.title">{{ props.title }}</h2>

@@ -1,11 +1,11 @@
 {
-  "name": "jelly-ui",
+  "name": "jelly-flex",
   "private": false,
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/jelly-ui.cjs",
-  "module": "./dist/jelly-ui.js",
-  "types": "./dist/jelly-ui.d.ts",
+  "main": "./dist/jelly-flex.cjs",
+  "module": "./dist/jelly-flex.js",
+  "types": "./dist/jelly-flex.d.ts",
   "scripts": {
     "dev": "vite --open",
     "build": "vue-tsc -b && vite build",

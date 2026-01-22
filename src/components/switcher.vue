@@ -1,5 +1,5 @@
 <template>
-  <div ref="thisRef" class="j-switcher jelly-ui" :j-selector="props.jSelector" j-type="JellyHTMLSwitcherElement" :multi="props.multiple.length > 0">
+  <div ref="thisRef" class="j-switcher jelly-flex" :j-selector="props.jSelector" j-type="JellyHTMLSwitcherElement" :multi="props.multiple.length > 0">
     <input v-model="value" type="checkbox" :name="props.name" :id="props.id" class="j-switcher-input"
       v-if="props.multiple.length == 0">
     <template v-if="props.multiple.length > 0">
@@ -7,7 +7,7 @@
         v-for="item, index in props.multiple" :key="index">
     </template>
     <div class="j-switcher__disable-text">已禁用</div>
-    <label :for="props.id" class="j-switcher-label jelly-ui" :id="`${props.id}__label`" :title="props.name"
+    <label :for="props.id" class="j-switcher-label jelly-flex" :id="`${props.id}__label`" :title="props.name"
       :color="props.color">
       <span class="j-switcher__text j-switcher__text--checked" v-if="props.multiple.length == 0">{{ props.checkedText
       }}</span>

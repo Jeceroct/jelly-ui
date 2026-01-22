@@ -14,11 +14,11 @@ JellyUI 的设计语言是柔和、年轻、易用的，注重用户体验和交
 
 <!-- ## 安装
 ```bash
-npm install jelly-ui
+npm install jelly-flex
 ```
 ## 使用
 ```bash
-import { Button } from 'jelly-ui'
+import { Button } from 'jelly-flex'
 ``` -->
 
 ## 组件

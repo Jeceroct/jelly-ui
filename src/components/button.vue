@@ -1,5 +1,5 @@
 <template>
-  <button class="j-button jelly-ui" ref="thisRef" j-type="JellyHTMLButtonElement" :j-selector="props.jSelector">
+  <button class="j-button jelly-flex" ref="thisRef" j-type="JellyHTMLButtonElement" :j-selector="props.jSelector">
     <div class="j-button__before">已禁用</div>
     <div class="j-button__start" v-if="hasStartSlot">
       <slot name="start"></slot>
